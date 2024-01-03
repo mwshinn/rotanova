@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block notloggedin %}{% endblock %}
+
+{% block loggedin %}
+<h2>Your cages</h2>
+{% if userid in cages_today.keys() %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>When</th>
+      <th>First date</th>
+      <th>Final date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cage in cages_today[userid][0] %}
+    <tr>
+      <td>{{ cage[0] }}</td>
+      <td>{{ "Morning" if cage[3] == 1 else "Afternoon" }}</td>
+      <td>{{ cage[1] }}</td>
+      <td>{{ cage[2] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No cages today</p>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>All cages</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Person</th>
+      <th>Morning cages</th>
+      <th>Afternoon cages</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for k,v in cages_today.items() %}
+    <tr>
+      <td>{{ person_names[k] }}</td>
+      <td>{% for cage in v[1] %} {{ cage[0] }} {% endfor %}</td>
+      <td>{% for cage in v[2] %} {{ cage[0] }} {% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Rota points</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Person</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for person in people|sort(attribute='tab') %}
+    {% if person['is_active'] == true %}
+    <tr {% if person['id'] == userid %}style="font-weight: bold"{% endif %}>
+      <td>{{ person['name'] }}</td>
+      <td>{{ person['tab']|round(2) }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}

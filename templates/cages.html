@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block loggedin %}
+<h2>Add cage</h2>
+<p>
+  <form action="/cages" method="post">
+    <input type="hidden" name="cage_requester" value="{{ userid }}" />
+    <input type="hidden" name="cage_id" value="-1" />
+    <label for="newcage_name">Name</label> <input type="text" id="newcage_name" name="cage_name" />
+    <label for="newcage_start">First day</label> <input type="date" id="newcage_start" min="{{ date_today }}" name="cage_start" value="{{ date_today }}" \>
+    <label for="newcage_end">Last day</label> <input type="date" id="newcage_end" name="cage_end" min="{{ date_today }}" value="{{ date_today }}" \>
+    <label for="newcage_morningafternoon">Time</label> <select id="newcage_morningafternoon" name="cage_morningafternoon"><option value="1">Morning</option><option value="2">Afternoon</option></select>
+    <label for="newcage_notes">Notes (optional)</label> <input type="text" id="newcage_notes" name="cage_notes" value="" />
+    <label for="newcage_owner">On behalf of</label><select id="newcage_owner" name="cage_owner">
+      <option value="{{ userid }}" selected>&mdash;</option>
+      {% for person in people %}
+      {% if person['is_active'] %}
+      <option value="{{ person['id'] }}">{{ person['name'] }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+    <br />
+    <input type="submit" value="Add cage" />
+  </form>
+</p>
+
+<h2>Edit cages</h2>
+{% for cage in cages %}
+<form id="form_{{ cage['id'] }}" action="/cages" method="post">
+  <input type="hidden" name="cage_id" value="{{ cage['id'] }}" />
+  <input type="hidden" name="cage_requester" value="{{ cage['requested_by_id'] }}" />
+  <input type="hidden" name="cage_owner" value="{{ cage['person_id'] }}" />
+</form>
+<form id="form_{{ cage['id'] }}_delete" action="/cages" method="post">
+  <input type="hidden" name="cage_id" value="{{ cage['id'] }}" />
+  <input type="hidden" name="delete_cage" value="1" />
+</form>
+{% endfor %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Start date</th>
+      <th>End date</th>
+      <th>Time</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cage in cages %}
+    <tr>
+      <td><input type="text" form="form_{{ cage['id'] }}" name="cage_name" size="10" value="{{ cage['name'] }}" /></td>
+      <td><input type="date" form="form_{{ cage['id'] }}" name="cage_start" value="{{ cage['first_day_formatted'] }}" {% if cage['first_day'] < todayraw %}readonly style="background-color: lightgrey;"{% endif %} /></td>
+      <td><input type="date" form="form_{{ cage['id'] }}" min="{{ date_today }}" name="cage_end" value="{{ cage['last_day_formatted'] }}" /></td>
+      <td><select form="form_{{ cage['id'] }}" name="cage_morningafternoon"><option value="1" {% if cage['morning_afternoon'] == 1 %}selected{% endif %}>Morning</option><option value="2" {% if cage['morning_afternoon'] == 2 %}selected{% endif %}>Afternoon</option></select></td>
+      <td><input type="text" form="form_{{ cage['id'] }}" name="cage_notes" size="10" value="{{ cage['notes'] }}" /></td>
+
+      <td><input type="submit" form="form_{{ cage['id'] }}" value="Save" /></td>
+      <td><input type="submit" form="form_{{ cage['id'] }}_delete" value="Delete" /></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

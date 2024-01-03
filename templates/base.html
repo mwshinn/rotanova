@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rota nova - {{ pagetitle }}</title>
+    <link rel="stylesheet" href="/res/simple.min.css">
+</head>
+<body>
+  <header>
+    <h1>Rota nova</h1>
+    <nav>
+      <a href="/" {% if request.endpoint == "home" %}class="current"{% endif %}>Home</a>
+      <a href="/cages" {% if request.endpoint == "cages" %}class="current"{% endif %}>Cages</a>
+      <a href="/signup" {% if request.endpoint == "signup" %}class="current"{% endif %}>Schedule</a>
+      <a href="/dorota" {% if request.endpoint == "dorota" %}class="current"{% endif %}>Do rota</a>
+      {% if is_admin %}
+      <a href="/users" {% if request.endpoint == "users" %}class="current"{% endif %}>Users</a>
+      <a href="/viewlog" {% if request.endpoint == "viewlog" %}class="current"{% endif %}>Log</a>
+      {% endif %}
+    </nav>
+    {% macro rota_status(today, title) -%}
+    {% if today is not none %}
+    <span style="white-space: nowrap;"><img width="24px" style="vertical-align:middle" src="/res/{% if today['completed'] %}2714{% else %}2B55{% endif %}.svg" /> {{ title }} ({{today['person_name'] }})</span>
+    {% else %}
+    <img width="24px" style="vertical-align:middle" src="/res/26AA.svg" /> No rota
+    {% endif %}
+    {%- endmacro %}
+    <p>Today's rota: {{ rota_status(rota_today[1], "Morning") }} {{ rota_status(rota_today[2], "Afternoon") }} {{ rota_status(rota_today[3], "Evening") }}</p>
+  </header>
+
+  <main>
+    {% if userid >= 0 %}
+    {% block loggedin %}{% endblock %}
+    {% endif %}
+
+    {% if userid == -1 %}
+    {% block notloggedin %}
+    <h2>Please log in</h2>
+    <form method="POST" action="/login">
+    <p><label for="userselectblock">Current user:</label>
+      <select id="userselectblock" name="user">
+        <option value="-1">Choose</option>
+        {% for p in people %}
+        <option value="{{ p['id'] }}">{{ p['name'] }}</option>
+        {% endfor %}
+      </select>
+    <input type="hidden" name="redirect" value="{{ request.endpoint }}" />
+    <input type="submit" value="Log in" /></p>
+    </form>
+    {% endblock %}
+    {% endif %}
+
+    {% if is_admin %}
+        {% block isadmin %}{% endblock %}
+    {% endif %}
+    {% if is_admin == false %}
+    {% block isnotadmin %}{% endblock %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    {% if userid != -1 %}
+    <p>Logged in as: <em>{{ user_name }}</em> (<a href="/logout">Log out</a>)</p>
+    {% else %}
+      <p>Not logged in</p>
+    {% endif %}
+  </footer>
+</body>
+</html>

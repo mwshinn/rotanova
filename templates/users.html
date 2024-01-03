@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block isadmin %}
+<h2>Edit users</h2>
+{% for person in people %}
+<form id="form_{{ person['id'] }}" action="/users" method="post">
+  <input type="hidden" name="person_id" value="{{ person['id'] }}" />
+</form>
+{% endfor %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Active</th>
+      <th>Cage price</th>
+      <th>Admin</th>
+      <th>Points</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for person in people %}
+    <tr>
+      <td><input type="text" form="form_{{ person['id'] }}" name="person_name" value="{{ person['name'] }}" size="10" /></td>
+      <td><input type="text" form="form_{{ person['id'] }}" name="person_email" value="{{ person['email'] }}" size="10" /></td>
+      <td><select form="form_{{ person['id'] }}" name="person_active"><option value="yes" {% if person['is_active'] == true %}selected{% endif %}>Active</option><option value="no" {% if person['is_active'] == false %}selected{% endif %}>Inactive</option></select></td>
+      <td><select form="form_{{ person['id'] }}" name="person_nocost"><option value="yes" {% if person['no_cost'] == true %}selected{% endif %}>Free</option><option value="no" {% if person['no_cost'] == false %}selected{% endif %}>Paid</option></select></td>
+      <td><select form="form_{{ person['id'] }}" name="person_admin"><option value="yes" {% if person['is_admin'] == true %}selected{% endif %}>Admin</option><option value="no" {% if person['is_admin'] == false %}selected{% endif %}>Regular</option></select></td>
+      <td><input type="text" form="form_{{ person['id'] }}" name="person_tab" value="{{ person['tab'] }}" size="5" /></td>
+      <td><input type="submit" form="form_{{ person['id'] }}" value="Save" /></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Add user</h2>
+<p>
+  <form action="/users" method="post">
+    <input type="hidden" name="person_id" value="-1" />
+    <label for="newperson_name">Name</label> <input type="text" id="newperson_name" name="person_name" />
+    <label for="newperson_email">Email</label> <input type="text" id="newperson_email" name="person_email" />
+    <label for="newperson_active">Active</label> <select id="newperson_active" name="person_active"><option value="yes" selected>Active</option><option value="no">Inactive</option></select>
+    <label for="newperson_nocost">Cage price</label> <select id="newperson_nocost" name="person_nocost"><option value="yes">Free</option><option value="no" selected>Paid</option></select>
+    <label for="newperson_admin">Administrator</label> <select id="newperson_admin" name="person_admin"><option value="yes" >Admin</option><option value="no" selected>Regular</option></select>
+    <label for="newperson_tab">Initial points</label> <input type="text" id="newperson_tab" name="person_tab" value="0.0" /><br />
+    <input type="submit" value="Add user" />
+  </form>
+</p>
+{% endblock %}
+
+{% block isnotadmin %}
+You must be an admin to view this page.
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block loggedin %}
+{% for morning_afternoon in [1, 2, 3] %}
+<h2>{{ {1: "Morning rota", 2: "Afternoon rota", 3: "Evening rota"}[morning_afternoon] }}</h2>
+{% if rota_today[morning_afternoon] == none %}
+No rota today
+{% elif rota_today[morning_afternoon]['completed'] == true %}
+Rota done by {{ rota_today[morning_afternoon]['person_name'] }}
+{% else %}
+<table>
+  <thead>
+    <tr>
+      <th>Cage</th>
+      <th>Owner</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cage in cages[morning_afternoon] %}
+    <tr>
+      <td>{{ cage['name'] }}</td>
+      <td>{{ cage['person_name'] }}</td>
+      <td>{{ cage['notes'] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if userid == rota_today[morning_afternoon]['person_id'] %}
+<form action="/dorota" method="post">
+  <input type="hidden" name="morning_afternoon" value="{{ morning_afternoon }}" />
+  <input type="hidden" name="date" value="{{ date_today }}" />
+  <input type="hidden" name="rota_done" value="1" />
+  {#
+  <label for="person_select" style="display: inline-block">Rota done by</label>
+  <select name="person_id" id="person_select">
+    {% for person in people %}
+    {% if person['is_active'] %}
+    <option value="{{ person['id'] }}" {% if userid == person['id'] %}selected{% endif %}>{{ person['name'] }}</option>
+    {% endif %}
+    {% endfor %}
+  </select> &nbsp;  #}
+  <input type="hidden" name="person_id" value="{{ userid }}" />
+  <input type="submit" value="Rota is done" />
+</form>
+
+{% else %}
+<em>Rota scheduled for {{ rota_today[morning_afternoon]['person_name'] }}</em>
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+{% endblock %}
+
+{% block isadmin %}
+<h2>Mark a rota as done when somebody forgot</h2>
+
+{% if old_carts|length > 0 %}
+{% for cart in old_carts.values() %}
+<form action="/dorota" method="post">
+  <input type="hidden" name="morning_afternoon" value="{{ cart.morning_afternoon }}" />
+  <input type="hidden" name="date" value="{{ cart.formatted_date }}" />
+  <input type="hidden" name="rota_done" value="1" />
+  <label for="personselect" style="display: inline-block">Orphan rota: {{ cart.morning_afternoon_string }} {{ cart.formatted_date }}, mark as done by</label>
+  <select name="person_id" id="person_select">
+    <option value="-1">Unknown</option>
+    <option value="-2">No rota</option>
+        <option disabled>──────</option>
+    {% for person in people %}
+    {% if person['is_active'] %}
+    <option value="{{ person['id'] }}" {% if cart.person_id == person['id'] %}selected{% endif %}>{{ person['name'] }}</option>
+    {% endif %}
+    {% endfor %}
+  </select>
+  <input type="submit" value="Save" />
+</form>
+{% endfor %} 
+{% else %}
+<em>No orphaned rotas</em>
+{% endif %}
+
+
+<h2>Do rota for someone else (admin override)</h2>
+
+<form action="/dorota" method="post">
+  <label for="person_select">Person</label>
+  <select name="person_id" id="person_select">
+    {% for person in people %}
+    {% if person['is_active'] %}
+    <option value="{{ person['id'] }}" {% if userid == person['id'] %}selected{% endif %}>{{ person['name'] }}</option>
+    {% endif %}
+    {% endfor %}
+  </select>
+  <label for="whichrota">Time</label>
+  <select name="morning_afternoon" id="whichrota">
+    <option value="1">Morning</option>
+    <option value="2">Afternoon</option>
+    <option value="3">Evening</option>
+  </select>
+  <label for="datefield">Date</label> <input id="datefield" type="date" name="date" value="{{ date_today }}" />
+  <input type="hidden" name="rota_done" value="1" />
+  <br />
+  <input type="submit" value="Do rota for someone else" />
+</form>
+
+
+{% endblock %}

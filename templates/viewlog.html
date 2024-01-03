@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block isadmin %}
+<h2>Log text</h2>
+<div style="height:500px;overflow:scroll">
+<pre>
+{{ logtext }}
+</pre>
+</div>
+{% endblock %}
+
+{% block isnotadmin %}
+You must be an admin to view this page.
+{% endblock %}
