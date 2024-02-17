@@ -87,10 +87,11 @@ delay.  I don't use the join features of the ORM because sqlalchemy really
 doesn't like having multiple foreign keys from one table in another table.
 E.g., here, cage owner and cage requester are both people.  It also doesn't like
 when you need to use a non-key flag value.  E.g., here, "-2" means "no rota",
-"-1" means "undefined", and 0-\infty means a user id, i.e., a foreign key.  (Had
-I known this about sqlalchemy before starting, I probably would have just used
-sqlite3 directly, but it really isn't worth it to rewrite it now since, again,
-small database with few users making very few requests.)
+"-1" means "undefined", "-3" means user selectable, and 0-\infty means a user
+id, i.e., a foreign key.  (Had I known this about sqlalchemy before starting, I
+probably would have just used sqlite3 directly, but it really isn't worth it to
+rewrite it now since, again, small database with few users making very few
+requests.)
 
 The database has three tables:
 
@@ -114,7 +115,10 @@ The database has three tables:
   day (if the rota was performed) or any time in the past (if the rota was not
   performed).  Once it is performed, set the "complete" flag to true.  Any rows
   at least one day old whcih are completed can be deleted.  Uncompleted rotas
-  mean that the points were not applied yet.
+  mean that the points were not applied yet.  There are special user ids which
+  are accepted here: -1 means none or invalid, -2 means no rota that day, and -3
+  means users can sign up for these days.  (Fridays do not need to be set to -3
+  as these allow signups by default.)  These userids are not valid elsewhere.
 
 The template "base.html" is called by everything else.  It has blocks that can
 be used to add content for everyone, for logged in users only, or for admins.
