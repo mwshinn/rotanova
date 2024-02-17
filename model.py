@@ -205,7 +205,7 @@ def reschedule_cart(date, morning_afternoon, person_id=None, completed=None, set
 
 def get_scheduled_carts(first_day=None, last_day=None, person_id=None):
     with orm.Session(engine) as session:
-        q = session.query(Cart, Person).filter(Cart.person_id.in_([Person.id, -1, -2]))
+        q = session.query(Cart, Person).filter(Cart.person_id.in_([Person.id, -1, -2, -3]))
         if person_id is not None:
             q = q.filter(Cart.person_id == person_id)
         if first_day is not None:

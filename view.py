@@ -33,6 +33,7 @@ def base_page_info():
         "people": people,
         "userid": int(userid),
         "date_today": date_today,
+        "weekday_today": utils.today().weekday()<5,
     }
 
 def page_saved(msg, good=True):
@@ -75,13 +76,13 @@ def page_admin():
 def page_users():
     return flask.render_template("users.html", pagetitle="Users", **base_page_info())
 
-def page_signup():
+def page_signup(hasherror=False):
     _base_page_info = base_page_info()
     is_admin = _base_page_info['is_admin']
     _dates = [utils.today(offset=i) for i in range(0, 30 if is_admin else 22)]
     dates = [(utils.format_date(d, pretty=True), utils.format_date(d)) for d in _dates if d.weekday() < 5]
     carts = model.get_scheduled_carts()
-    return flask.render_template("signup.html", pagetitle="Sign up", dates=dates, carts=carts, **_base_page_info)
+    return flask.render_template("signup.html", pagetitle="Sign up", dates=dates, carts=carts, carts_hash=utils.hash_carts(carts), hasherror=hasherror, **_base_page_info)
 
 def page_dorota():
     cages = {i : model.get_scheduled_cages(morning_afternoon=i) for i in [1, 2]}
@@ -92,7 +93,8 @@ def page_dorota():
 def page_cages():
     userid = flask.request.cookies.get('userid', -1)
     cages = model.get_scheduled_cages(person_id=userid, ignore_future=False)
-    return flask.render_template("cages.html", pagetitle="Cages", todayraw=utils.today(), cages=cages, **base_page_info())
+    cages_everyone = model.get_scheduled_cages(ignore_future=False)
+    return flask.render_template("cages.html", pagetitle="Cages", todayraw=utils.today(), cages=cages, cages_everyone=cages_everyone, **base_page_info())
 
 def page_viewlog():
     return flask.render_template("viewlog.html", logtext=log.get_log(), **base_page_info())

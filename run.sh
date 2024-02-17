@@ -1,2 +1,2 @@
-python -m flask --app controller run
+python3 -m flask --app controller run
 

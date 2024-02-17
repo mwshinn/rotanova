@@ -29,3 +29,7 @@ def format_date(date, pretty=False):
 def send_email(to, subject, body):
     # TODO
     print(f"Email to: {to}, Subject: {subject}\n\n{body}\n", flush=True)
+
+def hash_carts(carts):
+    """For detecting race conditions when editing the rota schedule"""
+    return str(hash(str(carts)))

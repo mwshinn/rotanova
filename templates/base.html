@@ -26,7 +26,7 @@
     <img width="24px" style="vertical-align:middle" src="/res/26AA.svg" /> No rota
     {% endif %}
     {%- endmacro %}
-    <p>Today's rota: {{ rota_status(rota_today[1], "Morning") }} {{ rota_status(rota_today[2], "Afternoon") }} {{ rota_status(rota_today[3], "Evening") }}</p>
+    <p>{% if weekday_today %}Today's{% else %}Monday's{% endif %} rota: {{ rota_status(rota_today[1], "Morning") }} {{ rota_status(rota_today[2], "Afternoon") }} {{ rota_status(rota_today[3], "Evening") }}</p>
   </header>
 
   <main>

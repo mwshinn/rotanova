@@ -69,6 +69,17 @@ def signup():
     # Process all cart assignments
     carts = model.get_scheduled_carts()
     postvars = dict(flask.request.form)
+    # A hash will help prevent race conditions.  We don't want this page to be
+    # open for the admin, then someone signs up, then the admin hits save.  Or,
+    # one person opens the page, another signs up for a date, and then the first
+    # person signs up for the same date.
+    carts_hash = utils.hash_carts(carts)
+    if "carts_hash" in postvars.keys() and postvars["carts_hash"] != carts_hash:
+        print(postvars["carts_hash"])
+        print(carts_hash)
+        print(str(carts))
+        return view.page_signup(hasherror=True)
+    # If someone is requesting a change
     if len(postvars) > 0:
         userid = flask.request.cookies.get('userid', -1)
         for k,v in postvars.items():

@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
 {% block loggedin %}
+
+{% if hasherror %}
+<p class="notice" style="color: red">You edited the schedule at the same time as somebody else.  Your changes were not saved.  Please try again.</p>
+{% endif %}
+
 <h2>Rota schedule</h2>
 <form action="/signup" method="post">
+<input type="hidden" name="carts_hash" value="{{ carts_hash }}" />
 <table>
   <thead>
-    <tr>
+    <tr style="border-bottom:thick black solid">
       <th>Date</th>
       <th>Morning</th>
       <th>Afternoon</th>
@@ -15,16 +21,20 @@
   <tbody>
     {% macro person_select(date, cartinfo, morning_afternoon) -%}
     {% if is_admin %}
-    <select name="person_{{ morning_afternoon }}_{{ date }}" {% if cartinfo['person_id'] == userid %}style="background-color:yellow;font-weight:bold;"{% endif %} >
-      <option value="-1" default {% if cartinfo['person_id'] == -1 %}selected{% endif %}>&mdash;</option>
-      <option value="-2" {% if cartinfo['person_id'] == -2 %}selected{% endif %}>No rota today</option>
+    <select name="person_{{ morning_afternoon }}_{{ date }}" {% if cartinfo['person_id'] == userid %}style="background-color:yellow;font-weight:bold;"{% elif cartinfo['person_id'] == -2 %}style="background-color:#999999"{% endif %} >
+      <option value="-1" default {% if cartinfo['person_id'] == -1 %}selected{% endif %}>{% if morning_afternoon == 3 %}Allow signup{% else %}&mdash;{% endif %}</option>
+      <option value="-2" {% if cartinfo['person_id'] == -2 %}selected{% endif %}>No rota</option>
+      {% if morning_afternoon != 3 %}
+          <option value="-3" {% if cartinfo['person_id'] == -3 %}selected{% endif %}>Allow signup</option>
+      {% endif %}
+      <option style="font-size: 5pt; background-color: #000000;" disabled>&nbsp;</option>
       {% for person in people %}
       {% if person['is_active'] %}
       <option value="{{ person['id'] }}" {% if cartinfo['person_id'] == person['id'] %}selected{% endif %}>{{ person['name'] }}</option>
       {% endif %}
       {% endfor %}
     </select>
-    {% elif morning_afternoon == 3 and cartinfo['person_id'] < 0 %}
+    {% elif (morning_afternoon == 3 and cartinfo['person_id'] == -1) or cartinfo['person_id'] == -3 %}
     <label for="signup_{{ morning_afternoon }}_{{ date }}" style="display:inline-block;">Sign up</label> <input type="checkbox" name="signup_{{ morning_afternoon }}_{{ date }}" id="signup_{{ morning_afternoon }}_{{ date }}" />
     {% elif cartinfo['person_id'] == userid %}
     <b><mark>{{ cartinfo['person_name'] }}</mark></b><!--<label for="signup_{{ morning_afternoon }}_{{ date }}">Cancel</label><input type="checkbox" name="cancel_{{ morning_afternoon }}_{{ date }}" id="signup_{{ key }}_{{ date }}" checked />-->
@@ -35,7 +45,7 @@
     {% endif %}
     {%- endmacro %}
     {% for date in dates %}
-    <tr>
+    <tr{% if "Fri" in date[0] %} style="border-bottom:thick black solid"{% endif %}>
       <td>{{ date[0] }}</td>
       <td>{{ person_select(date[1], carts.get((date[1],1), dict(person_name="-", person_id=-1)), 1) }}</td>
       <td>{{ person_select(date[1], carts.get((date[1],2), dict(person_name="-", person_id=-1)), 2) }}</td>
