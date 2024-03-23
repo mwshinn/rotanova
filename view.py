@@ -70,9 +70,6 @@ def page_home():
                                  your_cages=your_cages,
                                  **base_page_info())
 
-def page_admin():
-    return flask.render_template("admin.html", **base_page_info())
-
 def page_users():
     return flask.render_template("users.html", pagetitle="Users", **base_page_info())
 
@@ -96,5 +93,5 @@ def page_cages():
     cages_everyone = model.get_scheduled_cages(ignore_future=False)
     return flask.render_template("cages.html", pagetitle="Cages", todayraw=utils.today(), cages=cages, cages_everyone=cages_everyone, **base_page_info())
 
-def page_viewlog():
-    return flask.render_template("viewlog.html", logtext=log.get_log(), **base_page_info())
+def page_admin():
+    return flask.render_template("admin.html", logtext=log.get_log(), **base_page_info())

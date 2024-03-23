@@ -17,17 +17,35 @@ def notifications():
     #except Exception as e:
     #    log.log("Failed to send out email notifications", exception=str(e.exception), text=e.message)
         
+@app.before_request
+def ensure_user_not_inactive():
+    # This ensures if a user is logged into multiple computers and then sets
+    # themself as inactive on one computer, they will be logged out on the other
+    # computers as soon as they make a request.
+    userid = int(str(flask.request.cookies.get('userid', -1)))
+    if userid >= 0:
+        person = model.get_person_info(userid)
+        if not person['is_active']:
+            return logout()
+    
 
 @app.route("/login", methods=["POST"])
 def set_user_cookie():
     userid = str(int(flask.request.form.get('user', -1)))
     redirect = flask.request.form.get('redirect', '')
+    model.edit_person(userid, is_active=True)
     resp = flask.redirect("/"+redirect)
     resp.set_cookie('userid', userid)
     return resp
 
 @app.route("/logout")
 def logout():
+    inactivate = int(str(flask.request.args.get('away', "0")))
+    print("Inact status", inactivate)
+    if inactivate == 1:
+        userid = flask.request.cookies.get('userid', -1)
+        print("inactivating", userid, type(userid))
+        model.edit_person(userid, is_active=False)
     resp = flask.redirect("/")
     resp.set_cookie('userid', "-1")
     return resp
@@ -38,11 +56,10 @@ def home():
 
 @app.route("/admin")
 def admin():
+    database = int(str(flask.request.args.get('download_database', "0")))
+    if database == 1:
+        return flask.send_file("db.sqlite", as_attachment=True)
     return view.page_admin()
-
-@app.route("/viewlog")
-def viewlog():
-    return view.page_viewlog()
 
 @app.route("/users", methods=["GET", "POST"])
 def users():
@@ -132,7 +149,6 @@ def cages():
         model.delete_cage(cageid)
     elif cageid is not None:
         cageid = int(cageid)
-        print(flask.request.form)
         name = flask.request.form["cage_name"]
         requester_id = flask.request.form["cage_requester"]
         first_day = flask.request.form.get('cage_start', None)

@@ -61,7 +61,7 @@
   </thead>
   <tbody>
     {% for person in people|sort(attribute='tab') %}
-    {% if person['is_active'] == true %}
+    {% if person['is_active'] == true and person['no_cost'] == false %}
     <tr {% if person['id'] == userid %}style="font-weight: bold"{% endif %}>
       <td>{{ person['name'] }}</td>
       <td>{{ person['tab']|round(2) }}</td>
@@ -71,5 +71,8 @@
   </tbody>
 </table>
 
+{% if userid >= 0 %}
+<a class="button" href="/logout?away=1">Mark as inactive</a>
+{% endif %}
 
 {% endblock %}

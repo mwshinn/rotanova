@@ -110,7 +110,7 @@ def new_cage(name, first_day, last_day, morning_afternoon, person_id, requested_
     if requested_by_id is None:
         requested_by_id = person_id
     with orm.Session(engine) as session:
-        session.add(Cage(name=name, first_day=datetime.date(*map(int, first_day.split("-"))), last_day=datetime.date(*map(int, last_day.split("-"))), morning_afternoon=morning_afternoon, person_id=person_id, request_datetime=datetime.datetime.now(), notes=notes, requested_by_id=(requested_by_id if requested_by_id is not None else person_id)))
+        session.add(Cage(name=name, first_day=datetime.date(*map(int, first_day.split("-"))), last_day=datetime.date(*map(int, last_day.split("-"))), morning_afternoon=morning_afternoon, person_id=person_id, request_datetime=utils.now(), notes=notes, requested_by_id=(requested_by_id if requested_by_id is not None else person_id)))
         session.commit()
 
 def edit_cage(cage_id, name=None, first_day=None, last_day=None, morning_afternoon=None, person_id=None, requested_by_id=None, notes=None):
@@ -251,10 +251,10 @@ def cleanup():
                 session.delete(cage)
         session.commit()
 
-if len(get_people()) == 0:
-    new_person("max", is_admin=True, email="max@maxshinnpotential.com")
-    new_person("Charlie", email="charlie@gmail.com")
-    new_cage("MS002", "2023-12-02", "2024-12-13", 1, 1)
-    schedule_cart(1, "2024-1-02", 1, completed=True)
-    schedule_cart(2, "2024-1-03", 3)
-    schedule_cart(2, "2024-01-11", 1, completed=True)
+# if len(get_people()) == 0:
+#     new_person("max", is_admin=True, email="max@maxshinnpotential.com")
+#     new_person("Charlie", email="charlie@gmail.com")
+#     new_cage("MS002", "2023-12-02", "2024-12-13", 1, 1)
+#     schedule_cart(1, "2024-1-02", 1, completed=True)
+#     schedule_cart(2, "2024-1-03", 3)
+#     schedule_cart(2, "2024-01-11", 1, completed=True)

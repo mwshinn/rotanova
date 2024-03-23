@@ -9,8 +9,8 @@ BASE_URL = "http://zee.cortexlab.net"
 
 def check_and_dispatch():
     global _status
-    day = datetime.datetime.now().day
-    hour = datetime.datetime.now().hour
+    day = utils.now().day
+    hour = utils.now().hour
     # Run this function at most once per hour
     if _status['prev_day'] == day and _status['prev_hour'] == hour:
         return

@@ -2,6 +2,7 @@ import flask
 import datetime
 import re
 import model
+import utils
 
 LOGFILE = "log.txt"
 
@@ -18,7 +19,7 @@ def log(event_text, **kwargs):
     extra_info = {
         "ip_addr": flask.request.remote_addr,
         "ip_addr_noproxy": flask.request.environ.get("HTTP_X_FORWARDED_FOR", ""),
-        "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "time": utils.now().strftime("%Y-%m-%d %H:%M:%S"),
         "userid": userid,
         "username": model.get_person_info(userid)['name'] if userid >= 0 else ""
         }

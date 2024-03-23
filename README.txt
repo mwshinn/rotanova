@@ -53,7 +53,7 @@ to do whatever you want.  (However, the server is safe: there should be no way
 to read/write files on the remote server, execute server-side code, xss attacks,
 etc.  Inputs are sanitised and IO is limited to the database.)
 
-There are a few special types of accounts.  First, accoutns can be listed as
+There are a few special types of accounts.  First, accounts can be listed as
 "free cage" accounts.  These accounts do not participate in the rota points
 system.  They may request as many cages as they want without being charged rota
 points, and when they perform the rota, they do not gain rota points.
@@ -91,7 +91,8 @@ when you need to use a non-key flag value.  E.g., here, "-2" means "no rota",
 id, i.e., a foreign key.  (Had I known this about sqlalchemy before starting, I
 probably would have just used sqlite3 directly, but it really isn't worth it to
 rewrite it now since, again, small database with few users making very few
-requests.)
+requests.)  It should be easy to swap out the database engine if performance
+ever becomes a problem.
 
 The database has three tables:
 

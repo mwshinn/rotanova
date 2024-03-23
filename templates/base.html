@@ -16,7 +16,7 @@
       <a href="/dorota" {% if request.endpoint == "dorota" %}class="current"{% endif %}>Do rota</a>
       {% if is_admin %}
       <a href="/users" {% if request.endpoint == "users" %}class="current"{% endif %}>Users</a>
-      <a href="/viewlog" {% if request.endpoint == "viewlog" %}class="current"{% endif %}>Log</a>
+      <a href="/admin" {% if request.endpoint == "admin" %}class="current"{% endif %}>Admin</a>
       {% endif %}
     </nav>
     {% macro rota_status(today, title) -%}

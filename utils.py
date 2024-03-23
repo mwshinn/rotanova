@@ -22,6 +22,10 @@ def today(offset=0):
     """Define this here so we can monkey patch it in the tests"""
     return datetime.date.today() + datetime.timedelta(offset)
 
+def now():
+    """Define this here so we can monkey patch it in the tests"""
+    return datetime.datetime.now()
+
 def format_date(date, pretty=False):
     fmt = BASE_DATE_FORMAT if not pretty else PRETTY_DATE_FORMAT
     return date.strftime(fmt)
