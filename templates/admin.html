@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block isadmin %}
+<h2>Debug log</h2>
+<div style="height:500px;overflow:scroll">
+<pre>
+{{ logtext }}
+</pre>
+</div>
+<h2>Backups</h2>
+<a class="button" href="/admin?download_database=1">Download database backup</a>
+{% endblock %}
+
+{% block isnotadmin %}
+You must be an admin to view this page.
+{% endblock %}
