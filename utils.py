@@ -1,5 +1,9 @@
 from collections import Counter
 import datetime
+import email_secrets as secrets
+
+from smtplib import SMTP
+from email.mime.text import MIMEText
 
 BASE_DATE_FORMAT = "%Y-%m-%d"
 PRETTY_DATE_FORMAT = "%a %b %-d"
@@ -31,8 +35,15 @@ def format_date(date, pretty=False):
     return date.strftime(fmt)
 
 def send_email(to, subject, body):
-    # TODO
     print(f"Email to: {to}, Subject: {subject}\n\n{body}\n", flush=True)
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = f"\"Rota nova\" <{secrets.USERNAME}>"
+    msg['To'] = to
+    with SMTP(secrets.SERVER, secrets.PORT) as smtp_server:
+        smtp_server.starttls()
+        smtp_server.login(secrets.USERNAME, secrets.PASSWORD)
+        smtp_server.sendmail(secrets.USERNAME, [to], msg.as_string())
 
 def hash_carts(carts):
     """For detecting race conditions when editing the rota schedule"""
