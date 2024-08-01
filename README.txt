@@ -10,6 +10,52 @@ Requirements
 
 Sqlalchemy and flask
 
+Installation
+------------
+
+You will need:
+
+- Python package: flask, waitress, sqlalchemy
+
+
+If installing for the first time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- If there is still a database db.sqlite, delete it.
+
+- Rename "email_secrets.default.py" to "email_secrets.py" and edit this file
+  with the relevant information.
+
+- Add an admin user.  To add a user "Max", open a Python terminal and type:
+
+    import model
+    model.new_person("Max", "max@gmail.com", is_admin=True)
+
+To run manually:
+~~~~~~~~~~~~~~~~
+
+- Run ./run.sh in a persistant terminal (e.g. tmux or screen)
+
+To schedule automatically at boot:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Add a firewall rule to redirect port 8080 to port 80.  Do this by adding the
+  following line to the file /etc/rc.local before the "exit 0" call:
+
+    iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+- Add a cron job to start at boot.  You can do this with the line in crontab (as
+  a user, not root):
+
+    @reboot /home/max/rotanova/run_at_boot.sh
+
+- Optionally, add a cron job to ping the page every few minutes.  It does not
+  have a separate scheduler running in the background, so this makes sure
+  periodic updates get performed.  Add the following to crontab:
+
+    0,10,20,30,40,50  *       *       *       *       curl 127.0.0.1:8080
+
+
 How to use
 ----------
 
