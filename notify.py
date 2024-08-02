@@ -4,8 +4,15 @@ import utils
 import log
 from collections import Counter
 
+# _status contains the current state of the notifier.  Prev_day has the day of
+# the month in it from the last time notifications were sent, and prev_hour has
+# the same for the hour.  This function should only run once per hour and these
+# state variables make sure this is true.  The others are flags which describe
+# whether particular notifications have been sent yet, to make sure they are
+# only called once per day.
 _status = {"prev_day": 0, "prev_hour": -1, "sent_morning_reminders": False, "hour_last_morning_reminder": -1, "hour_last_afternoon_reminder": -1, "hour_last_evening_reminder": -1}
-BASE_URL = "http://zee.cortexlab.net"
+
+BASE_URL = "http://rota.cortexlab.net"
 
 def check_and_dispatch():
     global _status
@@ -36,8 +43,9 @@ def check_and_dispatch():
             utils.send_email(person['email'], "You are on rota today", msg)
     # After a given time of day, start sending out "did you forget to do the
     # rota" notifications to people every hour to make sure they don't forget.
-    # That time of day is given by rota_times.
-    rota_times = {1: 10, 2: 2, 3: 7}
+    # That time of day is given by rota_times.  1=morning, 2=afternoon,
+    # 3=evening
+    rota_times = {1: 10, 2: 14, 3: 17}
     for morning_afternoon in [1, 2, 3]:
         if hour < rota_times[morning_afternoon]:
             continue
@@ -69,4 +77,4 @@ def check_and_dispatch():
                 else:
                     model.reschedule_cart(person_id=person['id'], date=str(i_date), morning_afternoon=morning_afternoon)
                 # Schedule this person and email them
-                utils.send_email(person['email'], "You have been scheduled for the rota", f"You have been scheduled for the {model.MORNING_AFTERNOON_STRING[morning_afternoon]} rota on {str(i_date)}.  If the date does not work for you, please contact an administrator with an alternative date.")
+                utils.send_email(person['email'], "You have been scheduled for the rota", f"You have been automatically scheduled for the {model.MORNING_AFTERNOON_STRING[morning_afternoon]} rota on {str(i_date)}.  If the date does not work for you, please contact an administrator with an alternative date.")
